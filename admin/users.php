@@ -13,13 +13,16 @@ if (is_post()) {
     if ($action === 'delete' && is_int($id)) {
         if ($id === $me['id']) flash('error', ta('errDeleteSelf'));
         else {
+            $login = (string) db_val('SELECT login FROM users WHERE id = ?', [$id]);
             db_exec('DELETE FROM users WHERE id = ?', [$id]);
+            log_action('delete', 'user', $id, $login);
             flash('ok', ta('deleted'));
         }
     } elseif ($action === 'password' && is_int($id)) {
         if (mb_strlen($password) < 8) flash('error', ta('errPasswordShort'));
         else {
             db_exec('UPDATE users SET password_hash = ? WHERE id = ?', [password_hash($password, PASSWORD_DEFAULT), $id]);
+            log_action('update', 'user', $id, ta('newPassword'));
             flash('ok', ta('passwordChanged'));
         }
     } elseif ($action === 'role' && is_int($id) && $id !== $me['id'] && in_array(post_str('role', 20), ROLES, true)) {
@@ -35,6 +38,7 @@ if (is_post()) {
         else {
             db_exec('INSERT INTO users (login, name, password_hash, role) VALUES (?, ?, ?, ?)',
                 [$login, post_str('name', 100), password_hash($password, PASSWORD_DEFAULT), $role]);
+            log_action('create', 'user', (int) db()->lastInsertId(), $login);
             flash('ok', ta('saved'));
         }
     }

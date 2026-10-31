@@ -14,6 +14,7 @@ if (is_post()) {
     admin_require_csrf();
     if (post_str('action', 20) === 'delete' && $page) {
         db_exec('DELETE FROM pages WHERE id = ?', [$id]);
+        log_action('delete', 'page', $id, tr($page, 'title', admin_lang()));
         flash('ok', ta('deleted'));
         redirect('admin/pages.php');
     }
@@ -33,6 +34,7 @@ if (is_post()) {
             db_exec('INSERT INTO pages (' . implode(', ', $cols) . ') VALUES (' . implode(', ', array_fill(0, count($cols), '?')) . ')', array_values($values));
             $id = (int) db()->lastInsertId();
         }
+        log_action($page ? 'update' : 'create', 'page', $id, tr($values, 'title', admin_lang()));
         flash('ok', ta('saved'));
         redirect('admin/page.php', ['id' => $id]);
     }
@@ -52,7 +54,7 @@ admin_header($title, 'pages');
   <?php endif ?>
 </div>
 <?php if ($error): ?><div class="alert-error mb"><?= e($error) ?></div><?php endif ?>
-<form method="post" class="card pad stack">
+<form method="post" class="card pad stack" data-dirty-check>
   <?= csrf_field() ?>
   <div class="grid-3">
     <div><label class="label" for="slug"><?= e(ta('fSlug')) ?> *</label><input id="slug" name="slug" required pattern="[a-z0-9\-]+" maxlength="60" class="input" value="<?= e(form_val($row, 'slug')) ?>"><p class="tiny muted"><?= e(ta('hintSlug')) ?></p></div>

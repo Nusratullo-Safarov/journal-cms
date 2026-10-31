@@ -27,10 +27,11 @@ function logout(): void
 
 function current_user(): ?array
 {
-    static $user = false;
-    if ($user !== false) return $user;
-    if (($_SESSION['admin_until'] ?? 0) <= time() || empty($_SESSION['uid'])) return $user = null;
-    return $user = db_one('SELECT id, login, name, role FROM users WHERE id = ?', [$_SESSION['uid']]);
+    // Кэш по id из сессии: после входа или выхода в том же запросе данные обновляются
+    static $cache = [];
+    if (($_SESSION['admin_until'] ?? 0) <= time() || empty($_SESSION['uid'])) return null;
+    $uid = (int) $_SESSION['uid'];
+    return $cache[$uid] ??= db_one('SELECT id, login, name, role FROM users WHERE id = ?', [$uid]);
 }
 
 function is_admin_role(): bool

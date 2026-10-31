@@ -12,6 +12,9 @@ foreach (db_all('SELECT id, published_at FROM issues WHERE is_published = 1') as
 foreach (db_all('SELECT a.id, a.created_at FROM articles a JOIN issues i ON i.id = a.issue_id WHERE a.is_published = 1 AND i.is_published = 1') as $a) {
     $urls[] = [abs_url('article.php', ['id' => $a['id']]), $a['created_at']];
 }
+$urls[] = [abs_url('authors.php'), null];
+foreach (sections_with_counts() as $sec) $urls[] = [abs_url('section.php', ['id' => $sec['id']]), null];
+foreach (authors_index() as $au) $urls[] = [abs_url('author.php', ['name' => $au['name']]), null];
 foreach (db_all('SELECT id, published_at FROM news WHERE is_published = 1 AND published_at <= NOW()') as $n) {
     $urls[] = [abs_url('news.php', ['id' => $n['id']]), $n['published_at']];
 }

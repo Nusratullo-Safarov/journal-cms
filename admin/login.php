@@ -13,6 +13,7 @@ if (is_post()) {
     } elseif (!attempt_login(post_str('login', 50), is_string($_POST['password'] ?? null) ? $_POST['password'] : '')) {
         $error = ta('errLogin');
     } else {
+        log_action('login', 'user', current_user()['id'] ?? null, post_str('login', 50));
         redirect('admin/');
     }
 }

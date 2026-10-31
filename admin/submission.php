@@ -26,13 +26,15 @@ if (is_post()) {
     admin_require_csrf();
     if (post_str('action', 20) === 'delete') {
         db_exec('DELETE FROM submissions WHERE id = ?', [$id]);
+        log_action('delete', 'submission', $id, $s['title']);
         if ($fileOk) @unlink($path);
         flash('ok', ta('deleted'));
         redirect('admin/submissions.php');
     }
     $status = post_str('status', 20);
     if (in_array($status, SUBMISSION_STATUSES, true)) {
-        db_exec('UPDATE submissions SET status = ? WHERE id = ?', [$status, $id]);
+        db_exec('UPDATE submissions SET status = ?, notes = ? WHERE id = ?', [$status, post_str('notes', 10000), $id]);
+        log_action('update', 'submission', $id, $s['title'] . ' → ' . ta("sub_$status"));
         flash('ok', ta('saved'));
     }
     redirect('admin/submission.php', ['id' => $id]);
@@ -57,8 +59,13 @@ admin_header(ta('submissionN', ['n' => $s['id']]), 'submissions');
     <div class="muted"><?= e(ta('colFile')) ?></div>
     <div><?php if ($fileOk): ?><a href="<?= e(url('admin/submission.php', ['id' => $s['id'], 'download' => 1])) ?>" class="btn btn-ghost">⬇ <?= e($s['original_name']) ?></a><?php else: ?><span class="text-red">—</span><?php endif ?></div>
   </div>
-  <form method="post" class="card pad row-gap align-end">
+  <form method="post" class="card pad stack">
     <?= csrf_field() ?>
+    <div>
+      <label class="label" for="notes"><?= e(ta('editorNotes')) ?></label>
+      <textarea id="notes" name="notes" rows="4" class="input" placeholder="<?= e(ta('editorNotesHint')) ?>"><?= e($s['notes'] ?? '') ?></textarea>
+    </div>
+    <div class="row-gap align-end">
     <div>
       <label class="label" for="status"><?= e(ta('changeStatus')) ?></label>
       <select id="status" name="status" class="input w-auto">
@@ -67,6 +74,7 @@ admin_header(ta('submissionN', ['n' => $s['id']]), 'submissions');
     </div>
     <button class="btn btn-primary"><?= e(ta('save')) ?></button>
     <a href="mailto:<?= e($s['email']) ?>?subject=<?= e(rawurlencode(ta('submissionN', ['n' => $s['id']]) . ': ' . $s['title'])) ?>" class="btn btn-ghost"><?= e(ta('replyEmail')) ?></a>
+    </div>
   </form>
   <form method="post" data-confirm="<?= e(ta('confirmDelete')) ?>">
     <?= csrf_field() ?><button class="link-danger small" name="action" value="delete"><?= e(ta('deleteSubmission')) ?></button>
