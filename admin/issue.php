@@ -18,10 +18,22 @@ if (is_post()) {
             redirect('admin/issue.php', ['id' => $id]);
         }
         db_exec('DELETE FROM issues WHERE id = ?', [$id]);
+        log_action('delete', 'issue', $id, issue_label($issue));
         delete_upload($issue['cover']);
         delete_upload($issue['pdf']);
         flash('ok', ta('deleted'));
         redirect('admin/issues.php');
+    }
+
+    if (post_str('action', 20) === 'reorder' && $issue) {
+        foreach ((array) ($_POST['sort'] ?? []) as $aid => $pos) {
+            if (is_numeric($aid) && is_string($pos) && preg_match('/^\d{1,6}$/', $pos)) {
+                db_exec('UPDATE articles SET sort = ? WHERE id = ? AND issue_id = ?', [(int) $pos, (int) $aid, $id]);
+            }
+        }
+        log_action('update', 'issue', $id, issue_label($issue) . ' — ' . ta('articleOrder'));
+        flash('ok', ta('saved'));
+        redirect('admin/issue.php', ['id' => $id]);
     }
 
     $year = post_int('year');
@@ -43,6 +55,7 @@ if (is_post()) {
                 $id = (int) db()->lastInsertId();
             }
             cleanup_replaced_files($row, $files);
+            log_action($issue ? 'update' : 'create', 'issue', $id, issue_label($values));
             flash('ok', ta('saved'));
             redirect('admin/issue.php', ['id' => $id]);
         }
@@ -58,13 +71,13 @@ admin_header($title, 'issues');
   <?php if ($issue): ?>
     <div class="row-gap">
       <a href="<?= e(url('admin/articles.php', ['issue' => $id])) ?>" class="btn btn-ghost"><?= e(ta('navArticles')) ?></a>
-      <?php if ($issue['is_published']): ?><a href="<?= e(url('issue.php', ['id' => $id])) ?>" target="_blank" class="btn btn-ghost"><?= e(ta('viewOnSite')) ?></a><?php endif ?>
+      <a href="<?= e(url('issue.php', ['id' => $id, 'preview' => $issue['is_published'] ? null : 1])) ?>" target="_blank" class="btn btn-ghost"><?= e($issue['is_published'] ? ta('viewOnSite') : ta('preview')) ?></a>
       <form method="post" data-confirm="<?= e(ta('confirmDelete')) ?>"><?= csrf_field() ?><button class="btn btn-danger" name="action" value="delete"><?= e(ta('delete')) ?></button></form>
     </div>
   <?php endif ?>
 </div>
 <?php if ($error): ?><div class="alert-error mb"><?= e($error) ?></div><?php endif ?>
-<form method="post" enctype="multipart/form-data" class="card pad form-grid">
+<form method="post" enctype="multipart/form-data" class="card pad form-grid" data-dirty-check>
   <?= csrf_field() ?>
   <div class="stack">
     <div class="grid-3">
@@ -82,4 +95,27 @@ admin_header($title, 'issues');
   </div>
   <div class="form-actions"><button class="btn btn-primary"><?= e(ta('save')) ?></button></div>
 </form>
+
+<?php if ($issue): $articles = db_all('SELECT id, sort, pages, is_published, title_tj, title_ru, title_en, authors_tj, authors_ru, authors_en FROM articles WHERE issue_id = ? ORDER BY sort, id', [$id]); ?>
+<form method="post" class="card mt">
+  <?= csrf_field() ?><input type="hidden" name="action" value="reorder">
+  <div class="card-head">
+    <span><?= e(ta('articleOrder')) ?> <span class="muted normal">(<?= count($articles) ?>)</span></span>
+    <a href="<?= e(url('admin/article.php', ['issue' => $id])) ?>" class="btn btn-ghost btn-sm"><?= e(ta('addArticleHere')) ?></a>
+  </div>
+  <?php if (!$articles): ?><div class="pad muted small"><?= e(ta('noArticles')) ?></div><?php else: ?>
+    <table class="table">
+      <?php foreach ($articles as $a): ?>
+        <tr>
+          <td class="nowrap"><input name="sort[<?= (int) $a['id'] ?>]" value="<?= (int) $a['sort'] ?>" inputmode="numeric" class="input sort-input" aria-label="<?= e(ta('fSort')) ?>"></td>
+          <td><a href="<?= e(url('admin/article.php', ['id' => $a['id']])) ?>" class="link strong"><?= e(tr($a, 'title', admin_lang())) ?></a><div class="tiny muted"><?= e(authors_names($a, admin_lang())) ?></div></td>
+          <td class="muted nowrap"><?= e($a['pages']) ?></td>
+          <td><?= yes_no_badge($a['is_published']) ?></td>
+        </tr>
+      <?php endforeach ?>
+    </table>
+    <div class="pad"><button class="btn btn-ghost"><?= e(ta('saveOrder')) ?></button> <span class="tiny muted"><?= e(ta('orderHint')) ?></span></div>
+  <?php endif ?>
+</form>
+<?php endif ?>
 <?php admin_footer();

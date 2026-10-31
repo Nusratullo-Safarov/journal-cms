@@ -4,7 +4,7 @@ require __DIR__ . '/../includes/bootstrap.php';
 require __DIR__ . '/../includes/admin_layout.php';
 require_admin_role();
 
-const LANG_SETTINGS = ['journal_name', 'tagline', 'publisher', 'frequency', 'address'];
+const LANG_SETTINGS = ['journal_name', 'tagline', 'publisher', 'frequency', 'address', 'announcement'];
 const PLAIN_SETTINGS = ['issn_print' => 20, 'issn_online' => 20, 'email' => 150, 'phone' => 30, 'telegram_bot_token' => 100, 'telegram_chat_id' => 50];
 
 $row = settings_all();
@@ -15,6 +15,7 @@ if (is_post()) {
     foreach (PLAIN_SETTINGS as $k => $max) $values[$k] = post_str($k, $max);
     $values['color'] = strtolower(post_str('color', 7));
     $values['submissions_open'] = (string) post_bool('submissions_open');
+    $values['indexing'] = str_replace("\r\n", "\n", post_str('indexing', 3000));
     if ($values['journal_name_tj'] === '' && $values['journal_name_ru'] === '') $error = ta('errJournalName');
     elseif ($values['email'] !== '' && !filter_var($values['email'], FILTER_VALIDATE_EMAIL)) $error = ta('errEmail');
     elseif (!preg_match('/^#[0-9a-f]{6}$/', $values['color'])) $error = ta('errColor');
@@ -23,6 +24,7 @@ if (is_post()) {
         if (!$error) {
             save_settings($values + $files);
             cleanup_replaced_files($row, $files);
+            log_action('update', 'settings');
             flash('ok', ta('saved'));
             redirect('admin/settings.php');
         }
@@ -33,7 +35,7 @@ admin_header(ta('navSettings'), 'settings');
 ?>
 <h1 class="h1 mb"><?= e(ta('navSettings')) ?></h1>
 <?php if ($error): ?><div class="alert-error mb"><?= e($error) ?></div><?php endif ?>
-<form method="post" enctype="multipart/form-data" class="card pad form-grid">
+<form method="post" enctype="multipart/form-data" class="card pad form-grid" data-dirty-check>
   <?= csrf_field() ?>
   <div class="stack">
     <h2 class="h3"><?= e(ta('setJournal')) ?></h2>
@@ -43,7 +45,14 @@ admin_header(ta('navSettings'), 'settings');
         ['publisher', ta('sPublisher'), 'input', ['max' => 300]],
         ['frequency', ta('sFrequency'), 'input', ['max' => 300]],
         ['address', ta('sAddress'), 'input', ['max' => 300]],
+        ['announcement', ta('sAnnouncement'), 'input', ['max' => 300, 'hint' => ta('hintAnnouncement')]],
     ], $row) ?>
+    <div>
+      <label class="label" for="indexing"><?= e(ta('sIndexing')) ?></label>
+      <textarea id="indexing" name="indexing" rows="4" class="input" placeholder="Google Scholar | https://scholar.google.com"><?= e(form_val($row, 'indexing')) ?></textarea>
+      <p class="tiny muted"><?= e(ta('hintIndexing')) ?></p>
+    </div>
+    <div class="alert-ok small"><?= e(ta('oaiHint')) ?> <code><?= e(abs_url('oai.php')) ?></code></div>
   </div>
   <div class="stack">
     <div class="grid-2">

@@ -7,7 +7,10 @@ if (is_post()) {
     admin_require_csrf();
     $id = post_int('id');
     if (post_str('action', 20) === 'delete') {
-        if (is_int($id)) db_exec('DELETE FROM sections WHERE id = ?', [$id]);
+        if (is_int($id)) {
+            db_exec('DELETE FROM sections WHERE id = ?', [$id]);
+            log_action('delete', 'section', $id);
+        }
         flash('ok', ta('deleted'));
         redirect('admin/sections.php');
     }
@@ -18,6 +21,7 @@ if (is_post()) {
     else {
         if ($id) db_exec('UPDATE sections SET title_tj = ?, title_ru = ?, title_en = ?, sort = ? WHERE id = ?', [...array_values($values), $sort, $id]);
         else db_exec('INSERT INTO sections (title_tj, title_ru, title_en, sort) VALUES (?, ?, ?, ?)', [...array_values($values), $sort]);
+        log_action($id ? 'update' : 'create', 'section', $id ?: (int) db()->lastInsertId(), tr($values, 'title', admin_lang()));
         flash('ok', ta('saved'));
     }
     redirect('admin/sections.php');

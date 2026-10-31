@@ -115,8 +115,34 @@ CREATE TABLE IF NOT EXISTS submissions (
   file VARCHAR(100) NOT NULL,
   original_name VARCHAR(255) NOT NULL,
   status VARCHAR(20) NOT NULL DEFAULT 'new',
+  notes TEXT NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   KEY idx_submissions_status (status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Омори рӯзонаи дидан ва боргирии мақолаҳо (барои график дар панели идоракунӣ)
+CREATE TABLE IF NOT EXISTS article_stats (
+  article_id INT UNSIGNED NOT NULL,
+  day DATE NOT NULL,
+  views INT UNSIGNED NOT NULL DEFAULT 0,
+  downloads INT UNSIGNED NOT NULL DEFAULT 0,
+  PRIMARY KEY (article_id, day),
+  KEY idx_article_stats_day (day),
+  CONSTRAINT fk_article_stats_article FOREIGN KEY (article_id) REFERENCES articles (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Таърихи амалҳо дар панели идоракунӣ: кӣ, кай ва чӣ тағйир дод
+CREATE TABLE IF NOT EXISTS activity_log (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  user_id INT UNSIGNED NULL,
+  user_login VARCHAR(50) NOT NULL DEFAULT '',
+  action VARCHAR(20) NOT NULL,
+  entity VARCHAR(30) NOT NULL,
+  entity_id INT UNSIGNED NULL,
+  title VARCHAR(300) NOT NULL DEFAULT '',
+  ip VARCHAR(45) NOT NULL DEFAULT '',
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  KEY idx_activity_created (created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS rate_limits (
@@ -152,7 +178,12 @@ INSERT INTO settings (k, v) VALUES
   ('color', '#1d4ed8'),
   ('telegram_bot_token', ''),
   ('telegram_chat_id', ''),
-  ('submissions_open', '1');
+  ('submissions_open', '1'),
+  ('announcement_tj', ''),
+  ('announcement_ru', ''),
+  ('announcement_en', ''),
+  ('indexing', 'Google Scholar | https://scholar.google.com\nРИНЦ (eLibrary) | https://elibrary.ru\nCyberLeninka | https://cyberleninka.ru'),
+  ('db_version', '2');
 
 INSERT INTO sections (title_tj, title_ru, title_en, sort) VALUES
   ('Иқтисодиёт', 'Экономика', 'Economics', 1),

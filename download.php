@@ -7,7 +7,7 @@ if (!$a || $a['pdf'] === '') not_found();
 
 if (empty($_SESSION['downloaded'][$a['id']])) {
     $_SESSION['downloaded'][$a['id']] = 1;
-    db_exec('UPDATE articles SET downloads = downloads + 1 WHERE id = ?', [$a['id']]);
+    track_article((int) $a['id'], 'downloads');
 }
 session_write_close();
 

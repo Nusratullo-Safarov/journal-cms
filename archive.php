@@ -5,12 +5,16 @@ $years = issues_by_year();
 
 site_header(t('archive'), ['canonical' => abs_url('archive.php'), 'nav' => 'archive']);
 ?>
+<?= breadcrumbs([[t('home'), url()], [t('archive'), null]]) ?>
 <h1 class="h1 mb"><?= e(t('archive')) ?></h1>
+<?php if ($years): ?>
+  <nav class="letters" aria-label="<?= e(t('year')) ?>"><?php foreach (array_keys($years) as $y): ?><a href="#y<?= (int) $y ?>"><?= (int) $y ?></a><?php endforeach ?></nav>
+<?php endif ?>
 <?php if (!$years): ?>
   <div class="card pad muted"><?= e(t('noIssues')) ?></div>
 <?php endif ?>
 <?php foreach ($years as $year => $issues): ?>
-  <section class="year-block">
+  <section class="year-block" id="y<?= (int) $year ?>">
     <h2 class="h2"><?= (int) $year ?></h2>
     <div class="issue-grid">
       <?php foreach ($issues as $i): ?>

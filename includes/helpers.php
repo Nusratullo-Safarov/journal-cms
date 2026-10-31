@@ -214,3 +214,50 @@ function save_settings(array $values): void
     foreach ($values as $k => $v) $st->execute([$k, (string) $v]);
     settings_all(true);
 }
+
+// ---------- Омор ва таърихи амалҳо ----------
+
+/** Дидан ё боргирии мақола: ҳисобкунаки умумӣ ва омори рӯзона. $field — 'views' ё 'downloads'. */
+function track_article(int $id, string $field): void
+{
+    if (!in_array($field, ['views', 'downloads'], true)) return;
+    db_exec("UPDATE articles SET $field = $field + 1 WHERE id = ?", [$id]);
+    db_exec("INSERT INTO article_stats (article_id, day, $field) VALUES (?, CURDATE(), 1)
+             ON DUPLICATE KEY UPDATE $field = $field + 1", [$id]);
+}
+
+/** Сабти амал дар панели идоракунӣ. $action: create | update | delete | login | backup … */
+function log_action(string $action, string $entity, ?int $entityId = null, string $title = ''): void
+{
+    $user = current_user();
+    db_exec('INSERT INTO activity_log (user_id, user_login, action, entity, entity_id, title, ip) VALUES (?, ?, ?, ?, ?, ?, ?)', [
+        $user['id'] ?? null, $user['login'] ?? '', $action, $entity, $entityId, mb_substr($title, 0, 300), substr(client_ip(), 0, 45),
+    ]);
+}
+
+// ---------- Саҳифабандӣ ----------
+
+/** Возвращает [page, offset, pages] для списка из $total элементов. */
+function paginate(int $total, int $perPage): array
+{
+    $pages = max(1, (int) ceil($total / $perPage));
+    $page = min($pages, max(1, get_id('page') ?: 1));
+    return [$page, ($page - 1) * $perPage, $pages];
+}
+
+/** Ссылки на страницы. Сохраняет остальные GET-параметры. */
+function pager(int $page, int $pages): string
+{
+    if ($pages <= 1) return '';
+    $script = ltrim(substr($_SERVER['SCRIPT_NAME'] ?? '', strlen(base_path())), '/');
+    $query = array_filter($_GET, 'is_string');
+    $html = '<nav class="pager" aria-label="pagination">';
+    foreach (range(1, $pages) as $p) {
+        if ($pages > 9 && $p !== 1 && $p !== $pages && abs($p - $page) > 2) {
+            if (abs($p - $page) === 3) $html .= '<span>…</span>';
+            continue;
+        }
+        $html .= '<a href="' . e(url($script, ['page' => $p > 1 ? $p : null] + $query)) . '"' . ($p === $page ? ' class="active" aria-current="page"' : '') . '>' . $p . '</a>';
+    }
+    return $html . '</nav>';
+}

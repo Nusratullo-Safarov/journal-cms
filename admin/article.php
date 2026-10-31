@@ -18,6 +18,7 @@ if (is_post()) {
     admin_require_csrf();
     if (post_str('action', 20) === 'delete' && $article) {
         db_exec('DELETE FROM articles WHERE id = ?', [$id]);
+        log_action('delete', 'article', $id, tr($article, 'title', admin_lang()));
         delete_upload($article['pdf']);
         flash('ok', ta('deleted'));
         redirect('admin/articles.php', ['issue' => $article['issue_id']]);
@@ -48,6 +49,7 @@ if (is_post()) {
                 $id = (int) db()->lastInsertId();
             }
             cleanup_replaced_files($row, $files);
+            log_action($article ? 'update' : 'create', 'article', $id, tr($values, 'title', admin_lang()));
             flash('ok', ta('saved'));
             redirect('admin/article.php', post_str('next', 10) === 'new' ? ['issue' => $issueId] : ['id' => $id]);
         }
@@ -62,7 +64,7 @@ admin_header($title, 'articles');
   <h1 class="h1"><?= e($title) ?></h1>
   <?php if ($article): ?>
     <div class="row-gap">
-      <?php if ($article['is_published']): ?><a href="<?= e(url('article.php', ['id' => $id])) ?>" target="_blank" class="btn btn-ghost"><?= e(ta('viewOnSite')) ?></a><?php endif ?>
+      <a href="<?= e(url('article.php', ['id' => $id, 'preview' => 1])) ?>" target="_blank" class="btn btn-ghost"><?= e($article['is_published'] ? ta('viewOnSite') : ta('preview')) ?></a>
       <form method="post" data-confirm="<?= e(ta('confirmDelete')) ?>"><?= csrf_field() ?><button class="btn btn-danger" name="action" value="delete"><?= e(ta('delete')) ?></button></form>
     </div>
   <?php endif ?>
@@ -71,7 +73,7 @@ admin_header($title, 'articles');
   <div class="alert-error mb"><?= e(ta('needIssueFirst')) ?> <a href="<?= e(url('admin/issue.php')) ?>" class="link"><?= e(ta('addIssue')) ?></a></div>
 <?php endif ?>
 <?php if ($error): ?><div class="alert-error mb"><?= e($error) ?></div><?php endif ?>
-<form method="post" enctype="multipart/form-data" class="card pad form-grid">
+<form method="post" enctype="multipart/form-data" class="card pad form-grid" data-dirty-check>
   <?= csrf_field() ?>
   <div class="stack">
     <?php lang_tabs([

@@ -5,18 +5,28 @@ function admin_header(string $title, string $active = ''): void
 {
     $user = current_user();
     $newSubs = (int) db_val("SELECT COUNT(*) FROM submissions WHERE status = 'new'");
-    $nav = [
-        'overview' => ['admin/', ta('navOverview')],
-        'issues' => ['admin/issues.php', ta('navIssues')],
-        'articles' => ['admin/articles.php', ta('navArticles')],
-        'submissions' => ['admin/submissions.php', ta('navSubmissions') . ($newSubs ? " ($newSubs)" : '')],
-        'news' => ['admin/news.php', ta('navNews')],
-        'pages' => ['admin/pages.php', ta('navPages')],
-        'sections' => ['admin/sections.php', ta('navSections')],
+    $groups = [
+        '' => [
+            'overview' => ['admin/', '📊', ta('navOverview'), 0],
+        ],
+        ta('navGroupContent') => [
+            'issues' => ['admin/issues.php', '📚', ta('navIssues'), 0],
+            'articles' => ['admin/articles.php', '📄', ta('navArticles'), 0],
+            'submissions' => ['admin/submissions.php', '📥', ta('navSubmissions'), $newSubs],
+            'sections' => ['admin/sections.php', '🗂', ta('navSections'), 0],
+        ],
+        ta('navGroupSite') => [
+            'news' => ['admin/news.php', '📰', ta('navNews'), 0],
+            'pages' => ['admin/pages.php', '📝', ta('navPages'), 0],
+        ],
     ];
     if (is_admin_role()) {
-        $nav['settings'] = ['admin/settings.php', ta('navSettings')];
-        $nav['users'] = ['admin/users.php', ta('navUsers')];
+        $groups[ta('navGroupSystem')] = [
+            'settings' => ['admin/settings.php', '⚙️', ta('navSettings'), 0],
+            'users' => ['admin/users.php', '👥', ta('navUsers'), 0],
+            'activity' => ['admin/activity.php', '🕘', ta('navActivity'), 0],
+            'backup' => ['admin/backup.php', '💾', ta('navBackup'), 0],
+        ];
     }
     ?>
 <!DOCTYPE html>
@@ -26,6 +36,7 @@ function admin_header(string $title, string $active = ''): void
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
 <title><?= e($title) ?> — <?= e(ta('panel')) ?></title>
+<script>try{if(localStorage.getItem('theme')==='dark'||(!localStorage.getItem('theme')&&matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.dataset.theme='dark'}catch(e){}</script>
 <link rel="stylesheet" href="<?= e(asset('assets/style.css')) ?>">
 <style>:root { --brand: <?= brand_color() ?>; }</style>
 </head>
@@ -33,16 +44,21 @@ function admin_header(string $title, string $active = ''): void
 <aside class="admin-side">
   <a href="<?= e(url('admin/')) ?>" class="admin-brand"><?= logo_html() ?><span><?= e(ta('panel')) ?></span></a>
   <nav class="admin-nav">
-    <?php foreach ($nav as $key => [$href, $label]): ?>
-      <a href="<?= e(url($href)) ?>"<?= $key === $active ? ' class="active"' : '' ?>><?= e($label) ?></a>
+    <?php foreach ($groups as $label => $items): ?>
+      <?php if ($label !== ''): ?><div class="admin-nav-label"><?= e($label) ?></div><?php endif ?>
+      <?php foreach ($items as $key => [$href, $icon, $text, $badge]): ?>
+        <a href="<?= e(url($href)) ?>"<?= $key === $active ? ' class="active" aria-current="page"' : '' ?>><span aria-hidden="true"><?= $icon ?></span><?= e($text) ?><?php if ($badge): ?><span class="nav-badge"><?= $badge ?></span><?php endif ?></a>
+      <?php endforeach ?>
     <?php endforeach ?>
-    <a href="<?= e(url()) ?>" target="_blank"><?= e(ta('openSite')) ?></a>
+    <div class="admin-nav-label"></div>
+    <a href="<?= e(url()) ?>" target="_blank"><span aria-hidden="true">🌐</span><?= e(ta('openSite')) ?></a>
   </nav>
   <div class="admin-user">
-    <a href="<?= e(url('admin/profile.php')) ?>"<?= $active === 'profile' ? ' class="active"' : '' ?>>👤 <?= e($user['name'] !== '' ? $user['name'] : $user['login']) ?></a>
+    <a href="<?= e(url('admin/profile.php')) ?>"<?= $active === 'profile' ? ' class="active"' : '' ?>><span class="avatar" aria-hidden="true"><?= e(mb_substr($user['name'] !== '' ? $user['name'] : $user['login'], 0, 1)) ?></span><?= e($user['name'] !== '' ? $user['name'] : $user['login']) ?></a>
+    <button type="button" data-theme-toggle><span aria-hidden="true">🌓</span><?= e(ta('darkMode')) ?></button>
     <form method="post" action="<?= e(url('admin/logout.php')) ?>">
       <?= csrf_field() ?>
-      <button><?= e(ta('logout')) ?></button>
+      <button><span aria-hidden="true">↩</span><?= e(ta('logout')) ?></button>
     </form>
     <?= admin_lang_switch() ?>
   </div>
@@ -126,7 +142,7 @@ function lang_tabs(array $fields, array $row): void
           <?php if ($type === 'input'): ?>
             <input id="<?= $uid . $key ?>" name="<?= $key ?>" class="input" maxlength="<?= (int) ($opt['max'] ?? 500) ?>" value="<?= e(form_val($row, $key)) ?>"<?= $req ? ' required' : '' ?>>
           <?php else: ?>
-            <textarea id="<?= $uid . $key ?>" name="<?= $key ?>" class="input<?= $type === 'editor' ? ' rich' : '' ?>" rows="<?= (int) ($opt['rows'] ?? 4) ?>"<?= $type === 'editor' ? ' data-editor' : '' ?><?= $req ? ' required' : '' ?>><?= e(form_val($row, $key)) ?></textarea>
+            <textarea id="<?= $uid . $key ?>" name="<?= $key ?>" class="input<?= $type === 'editor' ? ' rich' : '' ?>" rows="<?= (int) ($opt['rows'] ?? 4) ?>"<?= $type === 'editor' ? ' data-editor data-upload-url="' . e(url('admin/upload.php')) . '" data-csrf="' . e(csrf_token()) . '"' : '' ?><?= $req ? ' required' : '' ?>><?= e(form_val($row, $key)) ?></textarea>
           <?php endif ?>
           <?php if (!empty($opt['hint'])): ?><p class="tiny muted"><?= e($opt['hint']) ?></p><?php endif ?>
         </div>
@@ -202,4 +218,14 @@ function submission_badge(string $status): string
 {
     $cls = ['new' => 'st-new', 'review' => 'st-review', 'accepted' => 'st-done', 'rejected' => 'st-cancelled'][$status] ?? '';
     return '<span class="status ' . $cls . '">' . e(ta("sub_$status")) . '</span>';
+}
+
+/** Як сатри таърихи амалҳо. */
+function activity_row(array $act): string
+{
+    $cls = in_array($act['action'], ['create', 'update', 'delete'], true) ? ' act-' . $act['action'] : '';
+    return '<li><span class="act-badge' . $cls . '">' . e(ta('act_' . $act['action'])) . '</span>'
+        . '<span class="grow"><b>' . e($act['user_login'] !== '' ? $act['user_login'] : '—') . '</b> · ' . e(ta('ent_' . $act['entity']))
+        . ($act['title'] !== '' ? ': ' . e($act['title']) : '') . '</span>'
+        . '<span class="tiny muted nowrap">' . e(format_date($act['created_at'], true)) . '</span></li>';
 }

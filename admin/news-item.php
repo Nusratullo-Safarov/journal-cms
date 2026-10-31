@@ -15,6 +15,7 @@ if (is_post()) {
     admin_require_csrf();
     if (post_str('action', 20) === 'delete' && $item) {
         db_exec('DELETE FROM news WHERE id = ?', [$id]);
+        log_action('delete', 'news', $id, tr($item, 'title', admin_lang()));
         delete_upload($item['image']);
         flash('ok', ta('deleted'));
         redirect('admin/news.php');
@@ -36,6 +37,7 @@ if (is_post()) {
                 $id = (int) db()->lastInsertId();
             }
             cleanup_replaced_files($row, $files);
+            log_action($item ? 'update' : 'create', 'news', $id, tr($values, 'title', admin_lang()));
             flash('ok', ta('saved'));
             redirect('admin/news-item.php', ['id' => $id]);
         }
@@ -56,7 +58,7 @@ admin_header($title, 'news');
   <?php endif ?>
 </div>
 <?php if ($error): ?><div class="alert-error mb"><?= e($error) ?></div><?php endif ?>
-<form method="post" enctype="multipart/form-data" class="card pad form-grid">
+<form method="post" enctype="multipart/form-data" class="card pad form-grid" data-dirty-check>
   <?= csrf_field() ?>
   <div class="stack">
     <?php lang_tabs([['title', ta('fTitle'), 'input', ['max' => 300, 'required' => true]], ['body', ta('fBody'), 'editor', ['rows' => 12]]], $row) ?>

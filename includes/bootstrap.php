@@ -15,6 +15,7 @@ require __DIR__ . '/queries.php';
 require __DIR__ . '/auth.php';
 require __DIR__ . '/uploads.php';
 require __DIR__ . '/layout.php';
+require __DIR__ . '/migrate.php';
 
 if (!is_file(__DIR__ . '/config.php')) {
     // Сайт ещё не установлен — отправляем на мастер установки
@@ -22,6 +23,7 @@ if (!is_file(__DIR__ . '/config.php')) {
     exit;
 }
 $CONFIG = require __DIR__ . '/config.php';
+ensure_schema();
 
 header('X-Content-Type-Options: nosniff');
 header('X-Frame-Options: SAMEORIGIN');
