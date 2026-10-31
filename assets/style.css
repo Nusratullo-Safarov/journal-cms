@@ -1,0 +1,353 @@
+/* Сомонаи маҷаллаи илмӣ — услубҳои сомона ва панели идоракунӣ. CSS-и оддӣ, сохтан (build) лозим нест.
+   Ранги асосӣ (--brand) аз «Танзимот» гирифта мешавад. */
+
+:root {
+  --brand: #1d4ed8;
+  --brand-soft: color-mix(in srgb, var(--brand) 10%, white);
+  --brand-dark: color-mix(in srgb, var(--brand) 80%, black);
+  --ink: #111827;
+  --gray-50: #f9fafb;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-300: #d1d5db;
+  --gray-400: #9ca3af;
+  --gray-500: #6b7280;
+  --gray-600: #4b5563;
+  --gray-700: #374151;
+  --green-50: #f0fdf4;
+  --green-700: #15803d;
+  --red-50: #fef2f2;
+  --red-600: #dc2626;
+  --red-700: #b91c1c;
+  --radius: 0.5rem;
+  --radius-lg: 0.75rem;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--ink);
+  background: var(--gray-50);
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; text-decoration: none; }
+a:hover { color: var(--brand); }
+img { max-width: 100%; display: block; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+h1, h2, h3, p, dl, dd, ul, ol { margin: 0; }
+table { border-collapse: collapse; }
+[hidden] { display: none !important; }
+code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 0.9em; background: var(--gray-100); padding: 0.1em 0.3em; border-radius: 0.25rem; }
+
+/* ---------- Текст ва утилитаҳо ---------- */
+.h1 { font-size: 1.6rem; font-weight: 700; line-height: 1.25; }
+.h2 { font-size: 1.25rem; font-weight: 700; line-height: 1.3; }
+.h3 { font-size: 1.05rem; font-weight: 700; }
+.lead { font-size: 1.1rem; color: var(--gray-700); }
+.small { font-size: 0.875rem; }
+.tiny { font-size: 0.75rem; }
+.muted { color: var(--gray-500); }
+.strong { font-weight: 600; }
+.mono { font-family: ui-monospace, Menlo, Consolas, monospace; }
+.pre-line { white-space: pre-line; }
+.nowrap { white-space: nowrap; }
+.right { text-align: right; }
+.truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.grow { flex: 1 1 0%; min-width: 0; }
+.mb { margin-bottom: 1rem; }
+.mb-sm { margin-bottom: 0.5rem; }
+.mb-lg { margin-bottom: 2rem; }
+.mt { margin-top: 1.75rem; }
+.pad { padding: 1.25rem; }
+.link { color: var(--brand); }
+.link:hover { text-decoration: underline; }
+.link-danger { background: none; border: 0; padding: 0; color: var(--red-600); }
+.link-danger:hover { text-decoration: underline; }
+.text-red { color: var(--red-600); }
+.row-gap { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; }
+.align-end { align-items: flex-end; }
+.stack > * + * { margin-top: 1rem; }
+.stack-sm > * + * { margin-top: 0.5rem; }
+.stack-lg > * + * { margin-top: 2rem; }
+.w-16 { width: 4.5rem; }
+.w-40 { width: 10rem; }
+.w-64 { width: 16rem; max-width: 100%; }
+.w-auto { width: auto; }
+.min-40 { min-width: 9rem; }
+.narrow { max-width: 52rem; }
+.wide { max-width: 72rem; }
+
+/* ---------- Тугмаҳо ва формаҳо ---------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+  padding: 0.55rem 1rem; border-radius: var(--radius); border: 1px solid transparent;
+  font-size: 0.9rem; font-weight: 500; line-height: 1.25rem; text-align: center;
+  transition: background-color .15s, border-color .15s, color .15s;
+}
+.btn:disabled { opacity: 0.5; cursor: default; }
+.btn-primary { background: var(--brand); color: #fff; }
+.btn-primary:hover:not(:disabled) { background: var(--brand-dark); color: #fff; }
+.btn-ghost { background: #fff; border-color: var(--gray-300); }
+.btn-ghost:hover { background: var(--gray-100); color: inherit; }
+.btn-danger { background: var(--red-600); color: #fff; }
+.btn-danger:hover { background: var(--red-700); color: #fff; }
+.btn-block { width: 100%; }
+.btn-sm { padding: 0.35rem 0.7rem; font-size: 0.8rem; }
+
+.input {
+  width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--gray-300); border-radius: var(--radius);
+  background: #fff; font-size: 0.9rem; outline: none;
+}
+.input:focus { border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-soft); }
+textarea.input { resize: vertical; }
+.label { display: block; margin-bottom: 0.25rem; font-size: 0.875rem; font-weight: 500; color: var(--gray-700); }
+.check { display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; }
+.fieldset { border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 1rem; margin: 0; }
+.fieldset legend { padding: 0 0.4rem; font-weight: 600; font-size: 0.9rem; }
+.alert-error { padding: 0.75rem 1rem; border-radius: var(--radius); background: var(--red-50); color: var(--red-700); font-size: 0.9rem; }
+.alert-ok { padding: 0.75rem 1rem; border-radius: var(--radius); background: var(--green-50); color: var(--green-700); font-size: 0.9rem; }
+.filters, .search-form { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.25rem; }
+.search-form .input { flex: 1; min-width: 12rem; }
+.color-input { width: 4rem; height: 2.5rem; padding: 0.15rem; border: 1px solid var(--gray-300); border-radius: var(--radius); background: #fff; }
+.grid-2, .grid-3 { display: grid; gap: 0.75rem; }
+
+/* ---------- Кортҳо ---------- */
+.card { background: #fff; border: 1px solid var(--gray-200); border-radius: var(--radius-lg); }
+.card-head { padding: 0.75rem 1rem; border-bottom: 1px solid var(--gray-200); font-weight: 700; }
+.divided > * + * { border-top: 1px solid var(--gray-100); }
+.empty-box { max-width: 28rem; margin: 0 auto; padding: 2.5rem; text-align: center; }
+.big-404 { font-size: 3rem; font-weight: 800; color: var(--brand); }
+.empty-box .h2 { margin: 0.5rem 0 1.5rem; }
+.tag { display: inline-block; border-radius: 999px; background: var(--gray-100); color: var(--gray-600); padding: 0.15rem 0.65rem; font-size: 0.8rem; }
+a.tag:hover { background: var(--brand-soft); color: var(--brand); }
+.tag-green { background: var(--green-50); color: var(--green-700); }
+.back-link { display: inline-block; margin-bottom: 0.75rem; font-size: 0.875rem; color: var(--gray-500); }
+.section-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem; margin-bottom: 1rem; }
+.kicker { font-size: 0.8rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--brand); }
+
+/* ---------- Сарлавҳа ва поён ---------- */
+.container { max-width: 76rem; margin: 0 auto; padding: 0 1rem; }
+.site-header { background: #fff; border-bottom: 1px solid var(--gray-200); }
+.header-top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; padding-top: 1rem; padding-bottom: 1rem; }
+.brand { display: flex; align-items: center; gap: 0.75rem; min-width: 0; }
+.brand:hover { color: inherit; }
+.logo-mark {
+  display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+  width: 2.75rem; height: 2.75rem; border-radius: var(--radius); background: var(--brand); color: #fff; font-weight: 800; font-size: 1.3rem;
+}
+.logo-img { height: 3.25rem; width: auto; max-width: 10rem; object-fit: contain; flex-shrink: 0; }
+.brand-text { display: flex; flex-direction: column; min-width: 0; }
+.brand-name { font-size: 1.25rem; font-weight: 800; line-height: 1.2; }
+.brand-tagline { font-size: 0.8rem; color: var(--gray-500); }
+.header-tools { display: flex; align-items: center; gap: 0.75rem; flex: 1 1 18rem; justify-content: flex-end; }
+.header-search { flex: 1; max-width: 22rem; }
+.lang-switch { display: inline-flex; flex-shrink: 0; overflow: hidden; border: 1px solid var(--gray-300); border-radius: var(--radius); font-size: 0.75rem; font-weight: 600; background: #fff; }
+.lang-switch a { padding: 0.4rem 0.55rem; color: var(--ink); }
+.lang-switch a:hover { background: var(--gray-100); color: var(--ink); }
+.lang-switch a.active { background: var(--brand); color: #fff; }
+.main-nav { background: var(--brand); color: #fff; }
+.main-nav ul { list-style: none; padding: 0; display: none; flex-direction: column; padding-bottom: 0.5rem; }
+.main-nav ul.open { display: flex; }
+.main-nav a { display: block; padding: 0.65rem 0.9rem; font-size: 0.92rem; font-weight: 500; color: #fff; }
+.main-nav a:hover, .main-nav a.active { background: rgba(255,255,255,.15); color: #fff; }
+.nav-toggle { background: none; border: 0; color: #fff; padding: 0.65rem 0; font-weight: 600; }
+.main { min-height: 60vh; padding-top: 1.5rem; padding-bottom: 2rem; }
+.site-footer { margin-top: 2rem; background: var(--ink); color: var(--gray-300); font-size: 0.875rem; }
+.site-footer a:hover { color: #fff; }
+.footer-grid { display: grid; gap: 1.5rem; padding-top: 2rem; padding-bottom: 1.5rem; }
+.footer-grid > div > * + * { margin-top: 0.3rem; }
+.footer-title { margin-bottom: 0.5rem; font-weight: 700; color: #fff; }
+.footer-bottom { padding-top: 1rem; padding-bottom: 1.5rem; border-top: 1px solid rgba(255,255,255,.1); color: var(--gray-400); font-size: 0.8rem; }
+
+/* ---------- Саҳифаи асосӣ ---------- */
+.layout-sidebar { display: grid; gap: 1.5rem; align-items: start; }
+.hero { padding: 1.75rem; border-top: 4px solid var(--brand); }
+.hero > * + * { margin-top: 0.75rem; }
+.hero-title { font-size: 1.8rem; font-weight: 800; line-height: 1.2; }
+.hero-tagline { font-size: 1.05rem; color: var(--brand); font-weight: 600; }
+.hero .row-gap { margin-top: 1.25rem; }
+.issue-preview { display: flex; flex-direction: column; overflow: hidden; }
+.issue-preview-cover { padding: 1rem; display: flex; justify-content: center; background: var(--gray-50); border-bottom: 1px solid var(--gray-100); }
+.issue-preview-cover .cover { width: 9rem; }
+.news-mini { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 0.75rem; }
+.news-mini a { display: flex; flex-direction: column; font-size: 0.9rem; line-height: 1.35; }
+.info-list { display: grid; grid-template-columns: auto 1fr; gap: 0.35rem 0.75rem; font-size: 0.875rem; }
+.info-list dt { color: var(--gray-500); }
+.info-list dd { overflow-wrap: anywhere; }
+
+/* ---------- Муқова ---------- */
+.cover { aspect-ratio: 3 / 4; width: 100%; object-fit: cover; border-radius: 0.35rem; box-shadow: 0 2px 8px rgba(0,0,0,.12); background: #fff; }
+.cover-blank {
+  display: flex; flex-direction: column; justify-content: space-between; padding: 0.9rem;
+  background: linear-gradient(160deg, var(--brand), var(--brand-dark)); color: #fff; text-align: left;
+}
+.cover-blank span { font-weight: 700; font-size: 0.85rem; line-height: 1.25; }
+.cover-blank b { font-size: 1rem; }
+
+/* ---------- Бойгонӣ ва шумора ---------- */
+.year-block + .year-block { margin-top: 2rem; }
+.year-block .h2 { margin-bottom: 0.75rem; padding-bottom: 0.4rem; border-bottom: 2px solid var(--brand); display: inline-block; }
+.issue-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+.issue-tile { display: flex; flex-direction: column; gap: 0.4rem; }
+.issue-tile:hover .cover { box-shadow: 0 6px 18px rgba(0,0,0,.2); }
+.issue-tile-label { font-weight: 600; }
+.issue-head { display: flex; flex-direction: column; gap: 1.25rem; padding: 1.25rem; margin-bottom: 1.5rem; }
+.issue-head-cover { width: 9rem; flex-shrink: 0; }
+.toc-section { margin-top: 1rem; overflow: hidden; }
+.toc-section-title { padding: 0.65rem 1rem; background: var(--brand-soft); color: var(--brand-dark); font-size: 0.95rem; font-weight: 700; }
+
+/* ---------- Мақола ---------- */
+.article-item { padding: 0.9rem 1rem; }
+.article-title { display: block; font-weight: 600; line-height: 1.35; }
+.article-authors { margin-top: 0.2rem; font-size: 0.875rem; color: var(--gray-600); font-style: italic; }
+.article-meta { display: flex; flex-wrap: wrap; gap: 0.35rem 1rem; margin-top: 0.3rem; font-size: 0.8rem; color: var(--gray-500); }
+.article-meta a { color: var(--brand); }
+.pdf-link { font-weight: 600; }
+.authors { list-style: none; padding: 0; }
+.authors li + li { margin-top: 0.25rem; }
+.abstract { text-align: justify; }
+.keywords { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.4rem; }
+.article-page section .h3 { margin-bottom: 0.4rem; }
+.other-lang { border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 0.6rem 0.9rem; }
+.other-lang + .other-lang { margin-top: 0.5rem; }
+.other-lang summary { cursor: pointer; font-weight: 600; font-size: 0.9rem; }
+.other-lang[open] summary { margin-bottom: 0.5rem; }
+.other-lang > * + * { margin-top: 0.4rem; }
+.refs { padding-left: 1.4rem; font-size: 0.9rem; }
+.refs li + li { margin-top: 0.3rem; }
+.cite { font-size: 0.875rem; background: var(--gray-50); border: 1px dashed var(--gray-300); border-radius: var(--radius); padding: 0.75rem; overflow-wrap: anywhere; }
+
+/* ---------- Матни саҳифаҳо (аз муҳаррир) ---------- */
+.prose { line-height: 1.7; overflow-wrap: break-word; }
+.prose > * + * { margin-top: 0.85rem; }
+.prose h2 { font-size: 1.25rem; margin-top: 1.5rem; }
+.prose h3 { font-size: 1.05rem; margin-top: 1.25rem; }
+.prose ul, .prose ol { padding-left: 1.5rem; }
+.prose a { color: var(--brand); text-decoration: underline; }
+.prose blockquote { margin-left: 0; padding-left: 1rem; border-left: 3px solid var(--brand); color: var(--gray-600); }
+.prose table { width: 100%; font-size: 0.9rem; }
+.prose td, .prose th { border: 1px solid var(--gray-200); padding: 0.4rem 0.6rem; }
+.prose img { border-radius: var(--radius); }
+.news-image { width: 100%; max-height: 26rem; object-fit: cover; border-radius: var(--radius); }
+
+/* ---------- Хабарҳо ---------- */
+.news-list { display: grid; gap: 1rem; }
+.news-card { display: flex; flex-direction: column; overflow: hidden; }
+.news-card img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; }
+.news-card:hover { border-color: var(--brand); color: inherit; }
+.pager { display: flex; gap: 0.35rem; margin-top: 1.5rem; }
+.pager a { padding: 0.35rem 0.75rem; border-radius: var(--radius); background: #fff; border: 1px solid var(--gray-200); }
+.pager a.active { background: var(--brand); border-color: var(--brand); color: #fff; }
+
+/* ---------- Даромад ва насб ---------- */
+.login-wrap { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem; padding: 1rem; }
+.login-box { width: 100%; max-width: 24rem; }
+.install-box { width: 100%; max-width: 40rem; }
+.login-title { display: flex; align-items: center; gap: 0.6rem; }
+.login-title .logo-img { height: 2.5rem; }
+
+/* ---------- Панели идоракунӣ ---------- */
+.admin-side { background: var(--ink); color: var(--gray-300); display: flex; flex-direction: column; }
+.admin-brand { display: flex; align-items: center; gap: 0.6rem; padding: 1rem; font-weight: 700; color: #fff; }
+.admin-brand:hover { color: #fff; }
+.admin-brand .logo-mark { width: 2rem; height: 2rem; font-size: 1rem; }
+.admin-brand .logo-img { height: 2rem; }
+.admin-nav { display: flex; gap: 0.15rem; overflow-x: auto; padding: 0 0.5rem 0.5rem; }
+.admin-nav a, .admin-user > a, .admin-user button {
+  display: block; white-space: nowrap; padding: 0.5rem 0.75rem; border-radius: 0.375rem;
+  font-size: 0.875rem; text-align: left; background: none; border: 0; color: inherit;
+}
+.admin-nav a:hover, .admin-nav a.active, .admin-user > a:hover, .admin-user > a.active, .admin-user button:hover { background: rgba(255,255,255,.1); color: #fff; }
+.admin-user { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem; padding: 0.5rem; border-top: 1px solid rgba(255,255,255,.1); }
+.admin-user .lang-switch { margin: 0.25rem 0.5rem; }
+.admin-main { flex: 1; min-width: 0; padding: 1rem; }
+.stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+.stat { padding: 1rem; }
+.stat:hover { border-color: var(--brand); color: inherit; }
+.stat-value { margin-top: 0.25rem; font-size: 1.6rem; font-weight: 800; }
+.two-col { display: grid; gap: 1.5rem; }
+.list-row { display: flex; align-items: center; gap: 0.75rem; padding: 0.7rem 1rem; font-size: 0.875rem; }
+.list-row:hover { background: var(--gray-50); color: inherit; }
+.tabs { display: flex; flex-wrap: wrap; gap: 0.25rem; }
+.tabs a { padding: 0.375rem 0.75rem; border-radius: 0.375rem; background: #fff; border: 1px solid var(--gray-200); font-size: 0.875rem; }
+.tabs a.active { background: var(--ink); border-color: var(--ink); color: #fff; }
+.scroll-x { overflow-x: auto; }
+.table { width: 100%; font-size: 0.875rem; }
+.table th { padding: 0.7rem 0.75rem; text-align: left; font-weight: 600; color: var(--gray-500); border-bottom: 1px solid var(--gray-200); white-space: nowrap; }
+.table th.right { text-align: right; }
+.table td { padding: 0.7rem 0.75rem; border-top: 1px solid var(--gray-100); vertical-align: top; }
+.table tr:first-child td { border-top: 0; }
+.table tbody tr:hover { background: var(--gray-50); }
+.status { display: inline-block; border-radius: 999px; padding: 0.1rem 0.6rem; font-size: 0.75rem; white-space: nowrap; }
+.st-new { background: #dbeafe; color: #1e40af; }
+.st-review { background: #fef3c7; color: #92400e; }
+.st-done { background: #dcfce7; color: #166534; }
+.st-cancelled { background: #e5e7eb; color: #374151; }
+.info-grid { display: grid; gap: 0.6rem 1rem; font-size: 0.9rem; }
+.form-grid { display: grid; gap: 1.5rem; }
+.form-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; padding-top: 0.5rem; border-top: 1px solid var(--gray-100); }
+.inline-form { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+.cat-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; padding: 0.9rem 1rem; }
+.file-field .thumb { width: 6rem; height: 6rem; object-fit: contain; border: 1px solid var(--gray-200); border-radius: var(--radius); background: #fff; }
+.file-current { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem; }
+
+/* Ҷадвалчаҳои забонҳо */
+.lang-tabs { border: 1px solid var(--gray-200); border-radius: var(--radius); }
+.lang-tabs-bar { display: none; border-bottom: 1px solid var(--gray-200); background: var(--gray-50); border-radius: var(--radius) var(--radius) 0 0; }
+.lang-tabs.js .lang-tabs-bar { display: flex; }
+.lang-tabs-bar button { background: none; border: 0; border-bottom: 2px solid transparent; padding: 0.55rem 1rem; font-size: 0.875rem; font-weight: 600; color: var(--gray-500); }
+.lang-tabs-bar button[aria-selected="true"] { color: var(--brand); border-bottom-color: var(--brand); background: #fff; }
+.lang-tabs-panel { padding: 1rem; }
+.lang-tabs-panel + .lang-tabs-panel { border-top: 1px solid var(--gray-200); }
+.lang-tabs-heading { font-weight: 700; font-size: 0.9rem; color: var(--brand); }
+.lang-tabs.js .lang-tabs-heading { display: none; }
+.lang-tabs.js .lang-tabs-panel + .lang-tabs-panel { border-top: 0; }
+
+/* Муҳаррири матн */
+.editor { border: 1px solid var(--gray-300); border-radius: var(--radius); background: #fff; }
+.editor:focus-within { border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-soft); }
+.editor-bar { display: flex; flex-wrap: wrap; gap: 0.15rem; padding: 0.35rem; border-bottom: 1px solid var(--gray-200); background: var(--gray-50); border-radius: var(--radius) var(--radius) 0 0; }
+.editor-bar button { min-width: 2rem; padding: 0.25rem 0.5rem; border: 1px solid transparent; border-radius: 0.3rem; background: none; font-size: 0.85rem; }
+.editor-bar button:hover, .editor-bar button.active { background: #fff; border-color: var(--gray-300); }
+.editor-src { margin-left: auto; font-family: ui-monospace, Menlo, Consolas, monospace; }
+.editor-area { min-height: 14rem; max-height: 38rem; overflow-y: auto; padding: 0.75rem 1rem; outline: none; font-size: 0.95rem; }
+.editor textarea { border: 0; border-radius: 0 0 var(--radius) var(--radius); min-height: 14rem; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 0.85rem; }
+
+/* ---------- Мутобиқат ба экран ---------- */
+@media (min-width: 640px) {
+  .grid-2 { grid-template-columns: repeat(2, 1fr); }
+  .grid-3 { grid-template-columns: repeat(3, 1fr); }
+  .issue-grid { grid-template-columns: repeat(3, 1fr); }
+  .issue-head { flex-direction: row; }
+  .issue-preview { flex-direction: row; }
+  .issue-preview-cover { border-bottom: 0; border-right: 1px solid var(--gray-100); align-items: flex-start; }
+  .info-grid { grid-template-columns: 10rem 1fr; }
+  .news-list { grid-template-columns: repeat(2, 1fr); }
+  .footer-grid { grid-template-columns: repeat(3, 1fr); }
+  .hero-title { font-size: 2.1rem; }
+}
+@media (min-width: 900px) {
+  .nav-toggle { display: none; }
+  .main-nav ul, .main-nav ul.open { display: flex; flex-direction: row; flex-wrap: wrap; padding-bottom: 0; }
+  .layout-sidebar { grid-template-columns: minmax(0, 1fr) 20rem; }
+  .issue-grid { grid-template-columns: repeat(5, 1fr); }
+  .news-list { grid-template-columns: repeat(3, 1fr); }
+  body.admin { display: flex; }
+  .admin-side { width: 15rem; min-height: 100vh; flex-shrink: 0; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+  .admin-nav { flex-direction: column; overflow: visible; }
+  .admin-user { margin-top: auto; flex-direction: column; align-items: stretch; }
+  .admin-user > a, .admin-user button { width: 100%; }
+  .admin-user .lang-switch { align-self: flex-start; }
+  .admin-main { padding: 2rem; }
+  .stat-grid { grid-template-columns: repeat(4, 1fr); }
+  .two-col { grid-template-columns: 1fr 1fr; }
+}
+@media (min-width: 1100px) {
+  .form-grid { grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); }
+  .form-actions { grid-column: 1 / -1; }
+}

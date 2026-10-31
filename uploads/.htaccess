@@ -1,0 +1,11 @@
+# Танҳо суратҳо ва PDF. Файлҳои дигар (махсусан .php) дода ва иҷро намешаванд.
+Options -Indexes -ExecCGI
+<FilesMatch ".*">
+  Require all denied
+</FilesMatch>
+<FilesMatch "(?i)^[a-f0-9]{24}\.(jpg|png|webp|pdf)$">
+  Require all granted
+</FilesMatch>
+<IfModule mod_headers.c>
+  Header set X-Content-Type-Options "nosniff"
+</IfModule>

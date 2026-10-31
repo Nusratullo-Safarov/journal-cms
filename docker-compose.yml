@@ -1,0 +1,32 @@
+# Оғоз: docker compose up -d --build  →  http://localhost:8080
+# Сипас http://localhost:8080/install.php -ро кушоед ва администраторро созед.
+services:
+  web:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8080:80"
+    environment:
+      DB_HOST: db
+      DB_NAME: journal
+      DB_USER: journal
+      DB_PASS: ${DB_PASS:-journal-secret}
+      SITE_URL: ${SITE_URL:-http://localhost:8080}
+    volumes:
+      - ./uploads:/var/www/html/uploads
+      - ./storage:/var/www/html/storage
+    depends_on:
+      - db
+  db:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: journal
+      MYSQL_USER: journal
+      MYSQL_PASSWORD: ${DB_PASS:-journal-secret}
+      MYSQL_RANDOM_ROOT_PASSWORD: "yes"
+    volumes:
+      - db-data:/var/lib/mysql
+      - ./database.sql:/docker-entrypoint-initdb.d/database.sql:ro
+volumes:
+  db-data:

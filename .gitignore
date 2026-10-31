@@ -1,0 +1,6 @@
+includes/config.php
+uploads/images/*
+uploads/pdf/*
+storage/submissions/*
+!.gitkeep
+.DS_Store
